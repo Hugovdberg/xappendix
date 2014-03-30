@@ -1,0 +1,5 @@
+# Ignore backup files of several editors.
+*.bak
+*~
+*.swp
+*.tks
