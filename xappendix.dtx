@@ -7,7 +7,7 @@
 ====================================================================
 xappendix - An extensible appendix package
 Maintained by Hugo van den Berg
-E-mail: hugo@tbdwebdesign.nl
+E-mail: latex-dev@tbdwebdesign.nl
 Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
 --------------------------------------------------------------------
@@ -59,7 +59,7 @@ are available on all modern TeX systems.
 ----------------------------------------------------------------
 xappendix - An extensible appendix package
 Maintained by Hugo van den Berg
-E-mail: hugo@tbdwebdesign.nl
+E-mail: latex-dev@tbdwebdesign.nl
 Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
 ----------------------------------------------------------------
@@ -68,7 +68,7 @@ See http://www.latex-project.org/lppl.txt
 \postamble
 
 Copyright (C) 2014 by Hugo van den Berg
-   <hugo@tbdwebdesign.nl>
+   <latex-dev@tbdwebdesign.nl>
 
 It may be distributed and/or modified under the conditions of
 the LaTeX Project Public License (LPPL), either version 1.3c of
@@ -99,7 +99,7 @@ This work consists of the file  xappendix.dtx
 \nopreamble\nopostamble
 \usedir{doc/latex/xappendix}
 \generate{
-  \file{README}{\from{\jobname.dtx}{readme}}
+  \file{README.txt}{\from{\jobname.dtx}{readme}}
 }
 \ifx\fmtname\nameofplainTeX
   \expandafter\endbatchfile
@@ -128,19 +128,85 @@ This work consists of the file  xappendix.dtx
 % 
 %\GetFileInfo{\jobname.sty}
 %
+%\providecommand*{\pkg}{\textsf}
 %\title{^^A
-%  \textsf{demopkg} --- description text\thanks{^^A
+%  \pkg{xappendix} --- An extensible appendix package\thanks{^^A
 %    This file describes version \fileversion, last revised \filedate.^^A
 %  }^^A
 %}
 %\author{^^A
-%  You\thanks{E-mail: you@your.domain}^^A
+%  Hugo van den Berg\thanks{E-mail: latex-dev@tbdwebdesign.nl}^^A
 %}
 %\date{Released \filedate}
 %
 %\maketitle
 %
-%\changes{v1.0}{2009/10/06}{First public release}
+%\changes{v0.0}{2014/03/31}{First development release}
+%
+%\begin{abstract}
+%For a long time the appendix package was the de facto standard
+%to configure appendices, including insertion of a part heading
+%before the first appendix, and inclusion in the table of contents.
+%
+%However, though interaction with the \pkg{hyperref} package is supported,
+%to add multiple sets of appendices one needs to take special care 
+%to prevent duplicate page anchors.
+%
+%This package aims to overcome these issues by adding built in 
+%support for multiple appendix sets. Furthermore, configuration 
+%has been rewritten to use \pkg{pgfkeys} as a frontend to redefining 
+%internal strings, as well as the use of LaTeX3.
+%\end{abstract}
+%
+% \tableofcontents
+%
+%\section{Introduction}
+%Describe what |\appendix| does by default, how \pkg{appendix} changes this,
+%and why this rewrite was started. \cs{memoir} detection, automatically disables
+%emulation of original \pkg{appendix}
+%
+%\section{Usage}\label{sec:use}
+%\pkg{xappendix} separates the typesetting of appendices into three stages: 
+%package loading, configuration, and execution. 
+%
+%\subsection{Package options}\label{ssec:use:opt}
+%Since \pkg{xappendix} aims to provide full backward compatibility with 
+%\pkg{appendix} (at least for the time being) some package options are available.
+%
+%First of all, to enable the backward compatibility the package option 
+%\texttt{compat} must be specified. This provides the necessary commands and sets 
+%these as the values in the \meta{default} appendix configuration. \textbf{Note:} 
+%backward compatibility relies on the \meta{default} configuration, altering this
+%with \cs{appendixset} might break it. See section \ref{sec:compat} for more
+%information on backward compatibility.
+%
+%\subsection{Configuration}\label{ssec:use:conf}
+%\DescribeMacro{\appendixset}
+%The main configuration of the package is through the
+%\cs{appendixset}\oarg{name}\marg{conf} command. 
+%
+%\subsection{Execution}\label{ssec:use:exec}
+%\DescribeMacro{\appendix}
+%Starting the appendices still works through the default \cs{appendix} command.
+%However, this has been modified to take an optional argument \oarg{name}, which
+%corresponds to the optional argument given to \cs{appendixset}. If no argument is
+%given it defaults to \meta{default}, for ease of use as well as backward compatibility.
+%
+%\DescribeEnvironment{appendices}
+%\DescribeEnvironment{subappendices}
+%
+%
+%\section{Backward compatibility}\label{sec:compat}
+%Backward compatibility is implemented by setting the configuration of the 
+%\meta{default} appendices. Since this implementation of the backward 
+%compatibility is inherently fragile it is recommended to use the new syntax 
+%wherever possible. Therefore the documentation here merely provides an 
+%overview of what new command the old commands are mapped to.
+%
+%\DescribeMacro{\appendixpage}
+%\DescribeMacro{\addappheadtotoc}
+%\DescribeMacro{\noappendicestocpagenum}
+%\DescribeMacro{\appendicestocpagenum}
 %
 %\DescribeMacro{\examplemacro}
 % Some text about an example macro called \cs{examplemacro}, which
@@ -157,7 +223,7 @@ This work consists of the file  xappendix.dtx
 %    \end{macrocode}
 %    
 %\begin{macro}{\examplemacro}
-%\changes{v1.0}{2009/10/06}{Some change from the previous version}
+%\changes{v0.0}{2014/03/31}{Some change from the previous version}
 %    \begin{macrocode}
 \newcommand*\examplemacro[2][]{%
   Some code here, probably
