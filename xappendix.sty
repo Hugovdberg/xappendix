@@ -13,11 +13,31 @@
 %% See http://www.latex-project.org/lppl.txt
 %% ----------------------------------------------------------------
 %% 
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{xappendix}[2014/03/30 v0.0 An extensible appendix package]
-\newcommand*\examplemacro[2][]{%
-  Some code here, probably
-}
+\ProvidesExplPackage {xappendix} {2014/04/01} {0.0}
+  {An extensible appendix package}
+\NewDocumentCommand\appendixset{O{default}}{
+    \pgfqkeys{/xappendix/#1}
+  }
+\RenewDocumentCommand\appendix{O{default}}{
+    \@@_apply_settings{#1}
+    \@@_old_appendix
+  }
+
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
 %% 
 %% Copyright (C) 2014 by Hugo van den Berg
 %%    <latex-dev@tbdwebdesign.nl>

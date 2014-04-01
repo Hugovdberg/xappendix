@@ -107,16 +107,13 @@ This work consists of the file  xappendix.dtx
   \expandafter\endgroup
 \fi
 %</internal>
-%<*package>
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{xappendix}[2014/03/30 v0.0 An extensible appendix package]
-%</package>
 %<*driver>
 \documentclass{l3doc}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{\jobname}
-\usepackage[numbered]{hypdoc}
+\usepackage{libertine}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage{xappendix}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -128,7 +125,11 @@ This work consists of the file  xappendix.dtx
 % 
 %\GetFileInfo{\jobname.sty}
 %
-%\providecommand*{\pkg}{\textsf}
+%\ProvideDocumentCommand\pkg{}{\textsf}
+%\ProvideDocumentCommand\env{}{\texttt}
+%\ProvideDocumentCommand\pkgopt{}{\texttt}
+%\ProvideDocumentCommand\pgfpath{}{\textcolor{BrickRed}}
+%
 %\title{^^A
 %  \pkg{xappendix} --- An extensible appendix package\thanks{^^A
 %    This file describes version \fileversion, last revised \filedate.^^A
@@ -192,46 +193,109 @@ This work consists of the file  xappendix.dtx
 %corresponds to the optional argument given to \cs{appendixset}. If no argument is
 %given it defaults to \meta{default}, for ease of use as well as backward compatibility.
 %
-%\DescribeEnvironment{appendices}
-%\DescribeEnvironment{subappendices}
-%
+%\DescribeEnv{appendices}
+%\DescribeEnv{subappendices}
+%Similar to the original \pkg{appendix} package these environments are provided
+%to group a set of appendices, either as a new chapter/section (in case of \env{appendices}), or as a section/subsection under the current chapter/section (in case of \env{subappendices}).
 %
 %\section{Backward compatibility}\label{sec:compat}
 %Backward compatibility is implemented by setting the configuration of the 
 %\meta{default} appendices. Since this implementation of the backward 
 %compatibility is inherently fragile it is recommended to use the new syntax 
-%wherever possible. Therefore the documentation here merely provides an 
-%overview of what new command the old commands are mapped to.
+%wherever possible. Therefore tables \ref{tab:compat:com} and 
+%\ref{tab:compat:opt} merely provide an overview of what new command the old 
+%commands are mapped to. Documentation of those commands can be found in the 
+%original \pkg{appendix} manual.
 %
-%\DescribeMacro{\appendixpage}
-%\DescribeMacro{\addappheadtotoc}
-%\DescribeMacro{\noappendicestocpagenum}
-%\DescribeMacro{\appendicestocpagenum}
+%\begin{table}
+%\centering
+%\caption{Mapping of old commands to new key}\label{tab:compat:com}
+%\begin{tabular}{ll}
+%\toprule
+%\textbf{Command}   & \textbf{Key}\\
+%\midrule
+%\cs{appendixpage}  & \pgfpath{/xappendix/\meta{name}/add page}\\
+%\cs{addappheadtotoc}  & \pgfpath{/xappendix/\meta{name}/add to toc}\\
+%\cs{noappendicestocpagenum}  & \pgfpath{/xappendix/\meta{name}/page num to toc=false}\\
+%\cs{appendicestocpagenum}  & \pgfpath{/xappendix/\meta{name}/page num to toc=true}\\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 %
-%\DescribeMacro{\examplemacro}
-% Some text about an example macro called \cs{examplemacro}, which
-% might have an optional argument \oarg{arg1} and mandatory one
-% \marg{arg2}. 
+%\begin{table}
+%\centering
+%\caption{Mapping of old package options to new key}\label{tab:compat:opt}
+%\begin{tabular}{ll}
+%\toprule
+%\textbf{Option}   & \textbf{Key}\\
+%\midrule
+%\pkgopt{toc}  & \pgfpath{/xappendix/\meta{name}/add to toc}\\
+%\pkgopt{title}  & \pgfpath{/xappendix/\meta{name}/add title}\\
+%\pkgopt{titletoc}  & \pgfpath{/xappendix/\meta{name}/add title in toc}\\
+%\pkgopt{header}  & \pgfpath{/xappendix/\meta{name}/add title in header}\\
+%\pkgopt{page}  & \pgfpath{/xappendix/\meta{name}/add page}\\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 %
 %\StopEventually{^^A
 %  \PrintChanges
 %  \PrintIndex
 %}
 %
+%\section{Implementation}
+%
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
-%    
-%\begin{macro}{\examplemacro}
-%\changes{v0.0}{2014/03/31}{Some change from the previous version}
+%
+%Declare module name for internal macros
 %    \begin{macrocode}
-\newcommand*\examplemacro[2][]{%
-  Some code here, probably
-}
+%<@@=xappendix>
+%    \end{macrocode}
+%
+%First of all announce the package signature, and enable expl    
+%    \begin{macrocode}
+\ProvidesExplPackage {xappendix} {2014/04/01} {0.0}
+  {An extensible appendix package}
+%    \end{macrocode}
+%
+%
+%\begin{macro}{\appendixset}
+%    \begin{macrocode}
+\NewDocumentCommand\appendixset{O{default}}{
+    \pgfqkeys{/xappendix/#1}
+  }
 %    \end{macrocode}
 %\end{macro} 
+%
+%Declare the package options
+%\begin{macro}{\appendix}
+%    \begin{macrocode}
+\RenewDocumentCommand\appendix{O{default}}{
+    \@@_apply_settings{#1}
+    \@@_old_appendix
+  }
+%    \end{macrocode}
+%\end{macro}
 %
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
 %\Finale
+
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
