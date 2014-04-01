@@ -13,14 +13,62 @@
 %% See http://www.latex-project.org/lppl.txt
 %% ----------------------------------------------------------------
 %% 
+\RequirePackage{expl3,xparse}
 \ProvidesExplPackage {xappendix} {2014/04/01} {0.0}
   {An extensible appendix package}
+\bool_new:N \g_@@_chapter_mode_bool
+\bool_new:N \g_@@_hyperref_bool
+\bool_new:N \g_@@_set_backward_compat_bool
+\bool_new:N \g_@@_add_to_toc_bool
+\bool_new:N \g_@@_add_title_bool
+\bool_new:N \g_@@_add_title_to_toc_bool
+\bool_new:N \g_@@_add_title_to_header_bool
+\bool_new:N \g_@@_add_page_bool
+
+\int_new:N \g_@@_appendix_number_int
+\cs_new_nopar:Nn \@@_endinput: {
+    \prg_do_nothing:
+  }
+\cs_if_exist:NTF \chapter {
+    \bool_gset_true:N \g_@@_chapter_mode_bool
+  } {
+    \cs_if_exist:NF \section {
+        \msg_new:nnn {xappendix} {class-incompatible} {
+            Current~class~incompatible~with~xappendix:~no~sectioning~commands~available.
+            \msg_see_documentation_text:n {xappendix}
+          }
+        \msg_warning:nn {xappendix} {class-incompatible}
+        \cs_gset:Nn \@@_endinput: {\endinput}
+      }
+  }
+\@@_endinput:
+\ProvideDocumentCommand\phantomsection{}{}
+\cs_new:Nn \@@_the_appendix_number: {
+    \int_to_alph:n {\g_@@_appendix_number_int}
+  }
+\AtBeginDocument {%
+    \@ifpackageloaded{hyperref}{%
+        \ExplSyntaxOn\bool_gset_true:N \g_@@_hyperref_bool\ExplSyntaxOff
+      }%
+  }
+
+\DeclareOption{compat}{\bool_gset_true:N \g_@@_set_backward_compat_bool}
+\DeclareOption{toc}{\bool_gset_true:N \g_@@_add_to_toc_bool}
+\DeclareOption{title}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{titletoc}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{header}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{page}{\bool_gset_true:N \g_@@_add_title_bool}
+\ProcessOptions*\relax
+
 \NewDocumentCommand\appendixset{O{default}}{
     \pgfqkeys{/xappendix/#1}
   }
-\RenewDocumentCommand\appendix{O{default}}{
-    \@@_apply_settings{#1}
-    \@@_old_appendix
+\cs_new:Nn \@@_old_appendix: {\prg_do_nothing:}
+\cs_set_eq:NN \@@_old_appendix: \appendix
+\cs_new:Nn \@@_apply_settings:n {#1}
+\RenewDocumentCommand \appendix {O{default}} {
+    \@@_apply_settings:n {#1}
+    \@@_old_appendix:
   }
 
 %% \CharacterTable

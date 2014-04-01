@@ -29,8 +29,8 @@ Installation
 ------------
 
 The package is supplied in `dtx` format and as a pre-extracted
-zip file, `xappendix.tds.zip`. The later is most convenient for
-most users: simply unzip this in your local texmf directory . If
+zip file, `xappendix.tds.zip`. The latter is most convenient for
+most users: simply unzip this in your local texmf directory. If
 you want to unpack the `.dtx` yourself, running `tex
 xappendix.dtx` will extract the package whereas `latex
 xappendix.dtx` will extract it and also typeset the documentation.
@@ -42,6 +42,14 @@ Suitable versions are available in MiKTeX 2.9 and TeX Live 2012
 (updating the relevant packages online may be necessary).
 LaTeX3, and so `xappendix`, requires the e-TeX extensions: these
 are available on all modern TeX systems.
+
+Furthermore, the documentation uses the following packages, which 
+need to be installed previously, although they will be by default
+on most systems.
+
+- libertine
+- xcolor
+- booktabs
 ====================================================================
 %</readme>
 %<*internal>
@@ -107,6 +115,9 @@ This work consists of the file  xappendix.dtx
   \expandafter\endgroup
 \fi
 %</internal>
+%<*driver|package>
+\RequirePackage{expl3,xparse}
+%</driver|package>
 %<*driver>
 \documentclass{l3doc}
 \usepackage[T1]{fontenc}
@@ -123,6 +134,9 @@ This work consists of the file  xappendix.dtx
 %</driver>
 % \fi
 % 
+%\DoNotIndex{
+%  NewDocumentCommand, ProvideDocumentCommand
+%}
 %\GetFileInfo{\jobname.sty}
 %
 %\ProvideDocumentCommand\pkg{}{\textsf}
@@ -156,7 +170,7 @@ This work consists of the file  xappendix.dtx
 %This package aims to overcome these issues by adding built in 
 %support for multiple appendix sets. Furthermore, configuration 
 %has been rewritten to use \pkg{pgfkeys} as a frontend to redefining 
-%internal strings, as well as the use of LaTeX3.
+%internal strings, as well as the use of \LaTeX3.
 %\end{abstract}
 %
 % \tableofcontents
@@ -260,6 +274,61 @@ This work consists of the file  xappendix.dtx
   {An extensible appendix package}
 %    \end{macrocode}
 %
+%Declare a number of switches for later reference.
+%    \begin{macrocode}
+\bool_new:N \g_@@_chapter_mode_bool
+\bool_new:N \g_@@_hyperref_bool
+\bool_new:N \g_@@_set_backward_compat_bool
+\bool_new:N \g_@@_add_to_toc_bool
+\bool_new:N \g_@@_add_title_bool
+\bool_new:N \g_@@_add_title_to_toc_bool
+\bool_new:N \g_@@_add_title_to_header_bool
+\bool_new:N \g_@@_add_page_bool
+
+\int_new:N \g_@@_appendix_number_int
+%    \end{macrocode}
+%
+%Check if the chapter command is defined, and if not whether the section
+%command is defined. If neither are available throw a warning and end input.
+%    \begin{macrocode}
+\cs_new_nopar:Nn \@@_endinput: {
+    \prg_do_nothing:
+  }
+\cs_if_exist:NTF \chapter {
+    \bool_gset_true:N \g_@@_chapter_mode_bool
+  } {
+    \cs_if_exist:NF \section {
+        \msg_new:nnn {xappendix} {class-incompatible} {
+            Current~class~incompatible~with~xappendix:~no~sectioning~commands~available.
+            \msg_see_documentation_text:n {xappendix}
+          }
+        \msg_warning:nn {xappendix} {class-incompatible}
+        \cs_gset:Nn \@@_endinput: {\endinput}
+      }
+  }
+\@@_endinput:
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\ProvideDocumentCommand\phantomsection{}{}
+\cs_new:Nn \@@_the_appendix_number: {
+    \int_to_alph:n {\g_@@_appendix_number_int}
+  }
+\AtBeginDocument {%
+    \@ifpackageloaded{hyperref}{%
+        \ExplSyntaxOn\bool_gset_true:N \g_@@_hyperref_bool\ExplSyntaxOff
+      }%
+  }
+
+\DeclareOption{compat}{\bool_gset_true:N \g_@@_set_backward_compat_bool}
+\DeclareOption{toc}{\bool_gset_true:N \g_@@_add_to_toc_bool}
+\DeclareOption{title}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{titletoc}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{header}{\bool_gset_true:N \g_@@_add_title_bool}
+\DeclareOption{page}{\bool_gset_true:N \g_@@_add_title_bool}
+\ProcessOptions*\relax
+
+%    \end{macrocode}
 %
 %\begin{macro}{\appendixset}
 %    \begin{macrocode}
@@ -269,12 +338,14 @@ This work consists of the file  xappendix.dtx
 %    \end{macrocode}
 %\end{macro} 
 %
-%Declare the package options
 %\begin{macro}{\appendix}
 %    \begin{macrocode}
-\RenewDocumentCommand\appendix{O{default}}{
-    \@@_apply_settings{#1}
-    \@@_old_appendix
+\cs_new:Nn \@@_old_appendix: {\prg_do_nothing:}
+\cs_set_eq:NN \@@_old_appendix: \appendix
+\cs_new:Nn \@@_apply_settings:n {#1}
+\RenewDocumentCommand \appendix {O{default}} {
+    \@@_apply_settings:n {#1}
+    \@@_old_appendix:
   }
 %    \end{macrocode}
 %\end{macro}
