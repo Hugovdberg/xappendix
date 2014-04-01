@@ -1,7 +1,7 @@
 # Ignore backup files of several editors.
-*.bak
+*.[bak|swp|old]
 *~
-*.swp
+# Ignore texmaker files
 *.tks
-*.log
-./build/
+# Ignore latex auxiliary files
+*.[log|aux|glo|gls|hd|idx|ilg|ind|out|toc]

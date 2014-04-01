@@ -18,7 +18,7 @@
   {An extensible appendix package}
 \bool_new:N \g_@@_chapter_mode_bool
 \bool_new:N \g_@@_hyperref_bool
-\bool_new:N \g_@@_set_backward_compat_bool
+\bool_new:N \g_@@_backward_compat_bool
 \bool_new:N \g_@@_add_to_toc_bool
 \bool_new:N \g_@@_add_title_bool
 \bool_new:N \g_@@_add_title_to_toc_bool
@@ -48,11 +48,11 @@
   }
 \AtBeginDocument {%
     \@ifpackageloaded{hyperref}{%
-        \ExplSyntaxOn\bool_gset_true:N \g_@@_hyperref_bool\ExplSyntaxOff
-      }%
+        \bool_gset_true:N \g_@@_hyperref_bool%
+      }{}%
   }
 
-\DeclareOption{compat}{\bool_gset_true:N \g_@@_set_backward_compat_bool}
+\DeclareOption{compat}{\bool_gset_true:N \g_@@_backward_compat_bool}
 \DeclareOption{toc}{\bool_gset_true:N \g_@@_add_to_toc_bool}
 \DeclareOption{title}{\bool_gset_true:N \g_@@_add_title_bool}
 \DeclareOption{titletoc}{\bool_gset_true:N \g_@@_add_title_bool}
@@ -60,6 +60,11 @@
 \DeclareOption{page}{\bool_gset_true:N \g_@@_add_title_bool}
 \ProcessOptions*\relax
 
+\NewDocumentCommand\testhyperref{}{
+    \bool_if:nTF {\g_@@_hyperref_bool}
+      {Hyperref detected}
+      {Hyperref not detected}
+  }
 \NewDocumentCommand\appendixset{O{default}}{
     \pgfqkeys{/xappendix/#1}
   }
