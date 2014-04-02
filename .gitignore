@@ -1,5 +1,7 @@
 # Ignore backup files of several editors.
-*.[bak|swp|old]
+*.bak
+*.swp
+*.old
 *~
 # Ignore texmaker files
 *.tks
