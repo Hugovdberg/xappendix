@@ -4,4 +4,7 @@
 # Ignore texmaker files
 *.tks
 # Ignore latex auxiliary files
+*.log
+*.aux
+*.glo
 *.[log|aux|glo|gls|hd|idx|ilg|ind|out|toc]
