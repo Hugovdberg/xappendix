@@ -16,3 +16,5 @@
 *.ind
 *.out
 *.toc
+# Ignore test build directory
+build/
