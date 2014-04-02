@@ -7,4 +7,10 @@
 *.log
 *.aux
 *.glo
-*.[log|aux|glo|gls|hd|idx|ilg|ind|out|toc]
+*.gls
+*.hd
+*.idx
+*.ilg
+*.ind
+*.out
+*.toc
