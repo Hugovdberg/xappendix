@@ -141,6 +141,40 @@
       { \msg_warning:nnx { xappendix } { deprecated-commands }
           { \appendixpageoff } }
   }
+\int_new:N \g__xappendix_save_section_int
+\int_new:N \g__xappendix_save_appendix_int
+\cs_new:Npn \g__xappendix_save_section_number:n {
+    \bool_if:nTF { \g__xappendix_chapter_mode_bool }
+      { \int_set:Nn { \g__xappendix_save_section_int } { \value{chapter} } }
+      { \int_set:Nn { \g__xappendix_save_section_int } { \value{section} } }
+  }
+\cs_new:Npn \g__xappendix_restore_section_number:n {
+    \bool_if:nTF { \g__xappendix_chapter_mode_bool }
+      { \int_set:Nn { \setcounter{chapter} } { \int_use:N \g__xappendix_save_section_int } }
+      { \int_set:Nn { \setcounter{section} } { \int_use:N \g__xappendix_save_section_int } }
+  }
+\cs_new:Npn \g__xappendix_save_appendix_number:n {
+    \bool_if:nTF { \g__xappendix_chapter_mode_bool }
+      { \int_set:Nn { \g__xappendix_save_appendix_int } { \value{chapter} } }
+      { \int_set:Nn { \g__xappendix_save_appendix_int } { \value{section} } }
+  }
+\cs_new:Npn \g__xappendix_restore_appendix_number:n {
+    \bool_if:nTF { \g__xappendix_chapter_mode_bool }
+      { \int_set:Nn { \setcounter{chapter} } { \int_use:N \g__xappendix_save_appendix_int } }
+      { \int_set:Nn { \setcounter{section} } { \int_use:N \g__xappendix_save_appendix_int } }
+  }
+\bool_if:nTF { \g__xappendix_backward_compat_bool }
+  {
+    \ProvideDocumentCommand \appendixname {} {Appendix}
+    \NewDocumentCommand \appendixtocname {} {Appendices}
+    \NewDocumentCommand \appendixpagename {} {Appendices}
+  } {
+    \ProvideDocumentCommand \appendixname {} {Appendix}
+    \NewDocumentCommand \appendixtocname {}
+      { \msg_warning { xappendix } { deprecated-commands } { \appendixtocname } }
+    \NewDocumentCommand \appendixpagename {}
+      { \msg_warning { xappendix } { deprecated-commands } { \appendixtocname } }
+  }
 \NewDocumentCommand\testhyperref{}{
     \bool_if:nTF {\g__xappendix_hyperref_bool}
       {Hyperref detected}

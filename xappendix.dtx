@@ -471,8 +471,50 @@ This work consists of the file  xappendix.dtx
 %\end{macro}
 %\end{macro}
 %
-%If package option compat is not set the other options make no sense,
-%so issue a warning.
+%Declare internal macros to save and restore section and chapter numbers
+%    \begin{macrocode}
+\int_new:N \g_@@_save_section_int
+\int_new:N \g_@@_save_appendix_int
+\cs_new:Npn \g_@@_save_section_number:n {
+    \bool_if:nTF { \g_@@_chapter_mode_bool } 
+      { \int_set:Nn { \g_@@_save_section_int } { \value{chapter} } }
+      { \int_set:Nn { \g_@@_save_section_int } { \value{section} } }
+  }
+\cs_new:Npn \g_@@_restore_section_number:n {
+    \bool_if:nTF { \g_@@_chapter_mode_bool }
+      { \int_set:Nn { \setcounter{chapter} } { \int_use:N \g_@@_save_section_int } }
+      { \int_set:Nn { \setcounter{section} } { \int_use:N \g_@@_save_section_int } }
+  }
+\cs_new:Npn \g_@@_save_appendix_number:n {
+    \bool_if:nTF { \g_@@_chapter_mode_bool } 
+      { \int_set:Nn { \g_@@_save_appendix_int } { \value{chapter} } }
+      { \int_set:Nn { \g_@@_save_appendix_int } { \value{section} } }
+  }
+\cs_new:Npn \g_@@_restore_appendix_number:n {
+    \bool_if:nTF { \g_@@_chapter_mode_bool }
+      { \int_set:Nn { \setcounter{chapter} } { \int_use:N \g_@@_save_appendix_int } }
+      { \int_set:Nn { \setcounter{section} } { \int_use:N \g_@@_save_appendix_int } }
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\bool_if:nTF { \g_@@_backward_compat_bool }
+  { 
+    \ProvideDocumentCommand \appendixname {} {Appendix} 
+    \NewDocumentCommand \appendixtocname {} {Appendices} 
+    \NewDocumentCommand \appendixpagename {} {Appendices} 
+  } {
+    \ProvideDocumentCommand \appendixname {} {Appendix}
+    \NewDocumentCommand \appendixtocname {} 
+      { \msg_warning { xappendix } { deprecated-commands } { \appendixtocname } }
+    \NewDocumentCommand \appendixpagename {} 
+      { \msg_warning { xappendix } { deprecated-commands } { \appendixtocname } }
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 \NewDocumentCommand\testhyperref{}{
     \bool_if:nTF {\g_@@_hyperref_bool}
