@@ -60,7 +60,7 @@ on most systems.
 \fi
 %</internal>
 %<*install>
-\input docstrip.tex
+\input l3docstrip.tex
 \keepsilent
 \askforoverwritefalse
 \preamble
@@ -237,6 +237,9 @@ This work consists of the file  xappendix.dtx
 %commands are mapped to. Documentation of those commands can be found in the 
 %original \pkg{appendix} manual.
 %
+%Usage of these options or commands without setting the package option \oarg{compat}
+%results in warning, and the command will be ignored.
+%
 %\begin{table}
 %\centering
 %\caption{Mapping of old commands to new key}\label{tab:compat:com}
@@ -278,7 +281,6 @@ This work consists of the file  xappendix.dtx
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
-%
 %Declare module name for internal macros
 %    \begin{macrocode}
 %<@@=xappendix>
@@ -341,7 +343,7 @@ This work consists of the file  xappendix.dtx
 %setup a warning to be issued if it is set without compat.
 %    \begin{macrocode}
 \msg_new:nnnn { xappendix } { deprecated-options }
-  { Old~style~package~option~#1~deprecated }
+  { Old~style~package~option~#1~deprecated,~ignored~without~option~compat }
   { Enable~option~compat~to~activate~old~options,~option~ignored. 
     \msg_see_documentation_text:n { xappendix } }
 %    \end{macrocode}
@@ -377,10 +379,97 @@ This work consists of the file  xappendix.dtx
 \ProcessOptions\relax
 %    \end{macrocode}
 %
-%
+%\begin{macro}{\appendixtocon}
+%\begin{macro}{\appendixtocoff}
+%\begin{macro}{\appendixtitleon}
+%\begin{macro}{\appendixtitleoff}
+%\begin{macro}{\appendixtitletocon}
+%\begin{macro}{\appendixtitletocoff}
+%\begin{macro}{\appendixheaderon}
+%\begin{macro}{\appendixheaderoff}
+%\begin{macro}{\appendixpageon}
+%\begin{macro}{\appendixpageoff}
+%Since depending on old style commands without the option compat, we declare
+%all commands only with the option set, and issue a warning if it's not.
 %    \begin{macrocode}
-
+\msg_new:nnnn { xappendix } { deprecated-commands }
+  { Old~style~command~#1~deprecated,~ignored~without~option~compat }
+  { Enable~package~option~compat~to~activate~old~commands,~command~ignored.
+    \msg_see_documentation_test:n { xappendix } }
+\bool_if:nTF { \g_@@_backward_compat_bool }
 %    \end{macrocode}
+%
+%Compatibility mode enabled, define old style commands
+%    \begin{macrocode}
+  {  
+    \NewDocumentCommand\appendixtocon {} 
+      { \bool_gset_true:N \g_@@_add_to_toc_bool }
+    \NewDocumentCommand\appendixtocoff {} 
+      { \bool_gset_false:N \g_@@_add_to_toc_bool }
+    \NewDocumentCommand\appendixtitleon {} 
+      { \bool_gset_true:N \g_@@_add_title_bool }
+    \NewDocumentCommand\appendixtitleoff {} 
+      { \bool_gset_false:N \g_@@_add_title_bool }
+    \NewDocumentCommand\appendixtitletocon {} 
+      { \bool_gset_true:N \g_@@_add_title_to_toc_bool }
+    \NewDocumentCommand\appendixtitletocoff {} 
+      { \bool_gset_false:N \g_@@_add_title_to_toc_bool }
+    \NewDocumentCommand\appendixheaderon {} 
+      { \bool_gset_true:N \g_@@_add_title_to_header_bool }
+    \NewDocumentCommand\appendixheaderoff {} 
+      { \bool_gset_false:N \g_@@_add_title_to_header_bool }
+    \NewDocumentCommand\appendixpageon {} 
+      { \bool_gset_true:N \g_@@_add_page_bool }
+    \NewDocumentCommand\appendixpageoff {} 
+      { \bool_gset_false:N \g_@@_add_page_bool }
+  }
+%    \end{macrocode}
+%
+%Compatibility mode disabled, issue warning only
+%    \begin{macrocode}
+  {
+    \NewDocumentCommand\appendixtocon {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtocon } }
+    \NewDocumentCommand\appendixtocoff {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixtocoff } }
+    \NewDocumentCommand\appendixtitleon {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixtitleon } }
+    \NewDocumentCommand\appendixtitleoff {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixtitleoff } }
+    \NewDocumentCommand\appendixtitletocon {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixtitletocon } }
+    \NewDocumentCommand\appendixtitletocoff {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixtitletocoff } }
+    \NewDocumentCommand\appendixheaderon {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixheaderon } }
+    \NewDocumentCommand\appendixheaderoff {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixheaderoff } }
+    \NewDocumentCommand\appendixpageon {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixpageon } }
+    \NewDocumentCommand\appendixpageoff {} 
+      { \msg_warning:nnx { xappendix } { deprecated-commands } 
+          { \appendixpageoff } }
+  }
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
 %
 %If package option compat is not set the other options make no sense,
 %so issue a warning.

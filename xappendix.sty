@@ -16,21 +16,21 @@
 \RequirePackage{expl3,xparse}
 \ProvidesExplPackage {xappendix} {2014/04/01} {0.0}
   {An extensible appendix package}
-\bool_new:N \g_@@_chapter_mode_bool
-\bool_new:N \g_@@_hyperref_bool
-\bool_new:N \g_@@_backward_compat_bool
-\bool_new:N \g_@@_add_to_toc_bool
-\bool_new:N \g_@@_add_title_bool
-\bool_new:N \g_@@_add_title_to_toc_bool
-\bool_new:N \g_@@_add_title_to_header_bool
-\bool_new:N \g_@@_add_page_bool
+\bool_new:N \g__xappendix_chapter_mode_bool
+\bool_new:N \g__xappendix_hyperref_bool
+\bool_new:N \g__xappendix_backward_compat_bool
+\bool_new:N \g__xappendix_add_to_toc_bool
+\bool_new:N \g__xappendix_add_title_bool
+\bool_new:N \g__xappendix_add_title_to_toc_bool
+\bool_new:N \g__xappendix_add_title_to_header_bool
+\bool_new:N \g__xappendix_add_page_bool
 
-\int_new:N \g_@@_appendix_number_int
-\cs_new_nopar:Nn \@@_endinput: {
+\int_new:N \g__xappendix_appendix_number_int
+\cs_new_nopar:Nn \__xappendix_endinput: {
     \prg_do_nothing:
   }
 \cs_if_exist:NTF \chapter {
-    \bool_gset_true:N \g_@@_chapter_mode_bool
+    \bool_gset_true:N \g__xappendix_chapter_mode_bool
   } {
     \cs_if_exist:NF \section {
         \msg_new:nnn {xappendix} {class-incompatible} {
@@ -38,65 +38,123 @@
             \msg_see_documentation_text:n {xappendix}
           }
         \msg_warning:nn {xappendix} {class-incompatible}
-        \cs_gset:Nn \@@_endinput: {\endinput}
+        \cs_gset:Nn \__xappendix_endinput: {\endinput}
       }
   }
-\@@_endinput:
+\__xappendix_endinput:
 \ProvideDocumentCommand\phantomsection{}{}
-\cs_new:Nn \@@_the_appendix_number: {
-    \int_to_alph:n {\g_@@_appendix_number_int}
+\cs_new:Nn \__xappendix_the_appendix_number: {
+    \int_to_alph:n {\g__xappendix_appendix_number_int}
   }
 \AtBeginDocument {%
     \@ifpackageloaded{hyperref}{%
-        \bool_gset_true:N \g_@@_hyperref_bool%
+        \bool_gset_true:N \g__xappendix_hyperref_bool%
       }{}%
   }
 \msg_new:nnnn { xappendix } { deprecated-options }
-  { Old~style~package~option~#1~deprecated }
+  { Old~style~package~option~#1~deprecated,~ignored~without~option~compat }
   { Enable~option~compat~to~activate~old~options,~option~ignored.
     \msg_see_documentation_text:n { xappendix } }
-\DeclareOption{compat}{ \bool_gset_true:N \g_@@_backward_compat_bool}
+\DeclareOption{compat}{ \bool_gset_true:N \g__xappendix_backward_compat_bool}
 \DeclareOption{toc}{
-  \bool_if:nTF { \g_@@_backward_compat_bool }
-    { \bool_gset_true:N \g_@@_add_to_toc_bool }
+  \bool_if:nTF { \g__xappendix_backward_compat_bool }
+    { \bool_gset_true:N \g__xappendix_add_to_toc_bool }
     { \msg_warning:nnx { xappendix } { deprecated-options } { toc } }
   }
 \DeclareOption{title}{
-  \bool_if:nTF { \g_@@_backward_compat_bool }
-    { \bool_gset_true:N \g_@@_add_title_bool }
+  \bool_if:nTF { \g__xappendix_backward_compat_bool }
+    { \bool_gset_true:N \g__xappendix_add_title_bool }
     { \msg_warning:nnx { xappendix } { deprecated-options } { title } }
   }
 \DeclareOption{titletoc}{
-  \bool_if:nTF { \g_@@_backward_compat_bool }
-    { \bool_gset_true:N \g_@@_add_title_to_toc_bool }
+  \bool_if:nTF { \g__xappendix_backward_compat_bool }
+    { \bool_gset_true:N \g__xappendix_add_title_to_toc_bool }
     { \msg_warning:nnx { xappendix } { deprecated-options } { titletoc } }
   }
 \DeclareOption{header}{
-  \bool_if:nTF { \g_@@_backward_compat_bool }
-    { \bool_gset_true:N \g_@@_add_title_to_header_bool }
+  \bool_if:nTF { \g__xappendix_backward_compat_bool }
+    { \bool_gset_true:N \g__xappendix_add_title_to_header_bool }
     { \msg_warning:nnx { xappendix } { deprecated-options } { header } }
   }
 \DeclareOption{page}{
-  \bool_if:nTF { \g_@@_backward_compat_bool }
-    { \bool_gset_true:N \g_@@_add_page_bool }
+  \bool_if:nTF { \g__xappendix_backward_compat_bool }
+    { \bool_gset_true:N \g__xappendix_add_page_bool }
     { \msg_warning:nnx { xappendix } { deprecated-options } { page } }
   }
 \ProcessOptions\relax
-
+\msg_new:nnnn { xappendix } { deprecated-commands }
+  { Old~style~command~#1~deprecated,~ignored~without~option~compat }
+  { Enable~package~option~compat~to~activate~old~commands,~command~ignored.
+    \msg_see_documentation_test:n { xappendix } }
+\bool_if:nTF { \g__xappendix_backward_compat_bool }
+  {
+    \NewDocumentCommand\appendixtocon {}
+      { \bool_gset_true:N \g__xappendix_add_to_toc_bool }
+    \NewDocumentCommand\appendixtocoff {}
+      { \bool_gset_false:N \g__xappendix_add_to_toc_bool }
+    \NewDocumentCommand\appendixtitleon {}
+      { \bool_gset_true:N \g__xappendix_add_title_bool }
+    \NewDocumentCommand\appendixtitleoff {}
+      { \bool_gset_false:N \g__xappendix_add_title_bool }
+    \NewDocumentCommand\appendixtitletocon {}
+      { \bool_gset_true:N \g__xappendix_add_title_to_toc_bool }
+    \NewDocumentCommand\appendixtitletocoff {}
+      { \bool_gset_false:N \g__xappendix_add_title_to_toc_bool }
+    \NewDocumentCommand\appendixheaderon {}
+      { \bool_gset_true:N \g__xappendix_add_title_to_header_bool }
+    \NewDocumentCommand\appendixheaderoff {}
+      { \bool_gset_false:N \g__xappendix_add_title_to_header_bool }
+    \NewDocumentCommand\appendixpageon {}
+      { \bool_gset_true:N \g__xappendix_add_page_bool }
+    \NewDocumentCommand\appendixpageoff {}
+      { \bool_gset_false:N \g__xappendix_add_page_bool }
+  }
+  {
+    \NewDocumentCommand\appendixtocon {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtocon } }
+    \NewDocumentCommand\appendixtocoff {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtocoff } }
+    \NewDocumentCommand\appendixtitleon {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtitleon } }
+    \NewDocumentCommand\appendixtitleoff {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtitleoff } }
+    \NewDocumentCommand\appendixtitletocon {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtitletocon } }
+    \NewDocumentCommand\appendixtitletocoff {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixtitletocoff } }
+    \NewDocumentCommand\appendixheaderon {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixheaderon } }
+    \NewDocumentCommand\appendixheaderoff {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixheaderoff } }
+    \NewDocumentCommand\appendixpageon {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixpageon } }
+    \NewDocumentCommand\appendixpageoff {}
+      { \msg_warning:nnx { xappendix } { deprecated-commands }
+          { \appendixpageoff } }
+  }
 \NewDocumentCommand\testhyperref{}{
-    \bool_if:nTF {\g_@@_hyperref_bool}
+    \bool_if:nTF {\g__xappendix_hyperref_bool}
       {Hyperref detected}
       {Hyperref not detected}
   }
 \NewDocumentCommand\appendixset{O{default}}{
     \pgfqkeys{/xappendix/#1}
   }
-\cs_new:Nn \@@_old_appendix: {\prg_do_nothing:}
-\cs_set_eq:NN \@@_old_appendix: \appendix
-\cs_new:Nn \@@_apply_settings:n {#1}
+\cs_new:Nn \__xappendix_old_appendix: {\prg_do_nothing:}
+\cs_set_eq:NN \__xappendix_old_appendix: \appendix
+\cs_new:Nn \__xappendix_apply_settings:n {#1}
 \RenewDocumentCommand \appendix {O{default}} {
-    \@@_apply_settings:n {#1}
-    \@@_old_appendix:
+    \__xappendix_apply_settings:n {#1}
+    \__xappendix_old_appendix:
   }
 
 %% 
